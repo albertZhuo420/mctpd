@@ -1,14 +1,9 @@
 #include "hw/DeviceMonitor.hpp"
 
-namespace hw
-{
+namespace hw {
 
-DeviceObserver::~DeviceObserver()
-{
-}
+DeviceObserver::~DeviceObserver() { }
 
-DeviceMonitor::~DeviceMonitor()
-{
-}
+DeviceMonitor::~DeviceMonitor() { }
 
-} // namespace hw
+}  // namespace hw

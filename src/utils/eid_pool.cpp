@@ -19,76 +19,61 @@
 #include <phosphor-logging/log.hpp>
 #include <system_error>
 
-namespace mctpd
-{
+namespace mctpd {
 
-void EidPool::initializeEidPool(const std::set<mctp_eid_t>& pool)
+void EidPool::initializeEidPool(const std::set<mctp_eid_t> &pool)
 {
-    for (auto const& epId : pool)
-    {
-        eidPool.push_back(std::make_pair(epId, false));
-    }
+	for (auto const &epId : pool) { eidPool.push_back(std::make_pair(epId, false)); }
 }
 
 void EidPool::updateEidStatus(const mctp_eid_t endpointId, const bool assigned)
 {
-    bool eidPresent = false;
-    size_t prevSize = eidPool.size();
-    // To implement EID pool in FIFO: The eid entry in the pool is removed and
-    // inserted at the end, so that the older EID from the pool is picked for
-    // registering the endpoint.
+	bool   eidPresent = false;
+	size_t prevSize	  = eidPool.size();
+	// To implement EID pool in FIFO: The eid entry in the pool is removed and
+	// inserted at the end, so that the older EID from the pool is picked for
+	// registering the endpoint.
 
-    eidPool.erase(std::remove_if(eidPool.begin(), eidPool.end(),
-                                 [endpointId](auto const& eidPair) {
-                                     return (eidPair.first == endpointId);
-                                 }),
-                  eidPool.end());
-    eidPresent = (prevSize > eidPool.size());
+	eidPool.erase(std::remove_if(
+					  eidPool.begin(),
+					  eidPool.end(),
+					  [endpointId](auto const &eidPair) { return (eidPair.first == endpointId); }),
+				  eidPool.end());
+	eidPresent = (prevSize > eidPool.size());
 
-    if (eidPresent)
-    {
-        eidPool.push_back(std::make_pair(endpointId, assigned));
+	if (eidPresent) {
+		eidPool.push_back(std::make_pair(endpointId, assigned));
 
-        if (assigned)
-        {
-            phosphor::logging::log<phosphor::logging::level::DEBUG>(
-                ("EID " + std::to_string(endpointId) + " is assigned").c_str());
-        }
-        else
-        {
-            phosphor::logging::log<phosphor::logging::level::DEBUG>(
-                ("EID " + std::to_string(endpointId) + " added to pool")
-                    .c_str());
-        }
-    }
-    else
-    {
-        phosphor::logging::log<phosphor::logging::level::INFO>(
-            ("Unable to find EID " + std::to_string(endpointId) +
-             " in the pool")
-                .c_str());
-    }
+		if (assigned) {
+			phosphor::logging::log<phosphor::logging::level::DEBUG>(
+				("EID " + std::to_string(endpointId) + " is assigned").c_str());
+		}
+		else {
+			phosphor::logging::log<phosphor::logging::level::DEBUG>(
+				("EID " + std::to_string(endpointId) + " added to pool").c_str());
+		}
+	}
+	else {
+		phosphor::logging::log<phosphor::logging::level::INFO>(
+			("Unable to find EID " + std::to_string(endpointId) + " in the pool").c_str());
+	}
 }
 
 mctp_eid_t EidPool::getAvailableEidFromPool()
 {
-    // Note:- No need to check for busowner role explicitly when accessing EID
-    // pool since getAvailableEidFromPool will be called only in busowner mode.
+	// Note:- No need to check for busowner role explicitly when accessing EID
+	// pool since getAvailableEidFromPool will be called only in busowner mode.
 
-    for (auto& [eid, eidAssignedStatus] : eidPool)
-    {
-        if (!eidAssignedStatus)
-        {
-            phosphor::logging::log<phosphor::logging::level::DEBUG>(
-                ("Allocated EID: " + std::to_string(eid)).c_str());
-            eidAssignedStatus = true;
-            return eid;
-        }
-    }
-    phosphor::logging::log<phosphor::logging::level::ERR>(
-        "No free EID in the pool");
-    throw std::system_error(
-        std::make_error_code(std::errc::address_not_available));
+	for (auto &[eid, eidAssignedStatus] : eidPool) {
+		if (!eidAssignedStatus) {
+			phosphor::logging::log<phosphor::logging::level::DEBUG>(
+				("Allocated EID: " + std::to_string(eid)).c_str());
+			eidAssignedStatus = true;
+			return eid;
+		}
+	}
+	phosphor::logging::log<phosphor::logging::level::ERR>("No free EID in the pool");
+	throw std::system_error(std::make_error_code(std::errc::address_not_available));
 }
 
-} // namespace mctpd
+}  // namespace mctpd

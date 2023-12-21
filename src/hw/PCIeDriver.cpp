@@ -1,10 +1,7 @@
 #include "hw/PCIeDriver.hpp"
 
-namespace hw
-{
+namespace hw {
 
-PCIeDriver::~PCIeDriver()
-{
-}
+PCIeDriver::~PCIeDriver() { }
 
-} // namespace hw
+}  // namespace hw

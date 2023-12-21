@@ -1,24 +1,21 @@
 #pragma once
 #include <memory>
 
-namespace hw
-{
+namespace hw {
 
-class DeviceObserver
-{
+class DeviceObserver {
   public:
-    virtual void deviceReadyNotify(bool ready) = 0;
+	virtual void deviceReadyNotify(bool ready) = 0;
 
-    virtual ~DeviceObserver();
+	virtual ~DeviceObserver();
 };
 
-class DeviceMonitor
-{
+class DeviceMonitor {
   public:
-    virtual bool initialize() = 0;
-    virtual void observe(std::weak_ptr<DeviceObserver> target) = 0;
+	virtual bool initialize()								   = 0;
+	virtual void observe(std::weak_ptr<DeviceObserver> target) = 0;
 
-    virtual ~DeviceMonitor();
+	virtual ~DeviceMonitor();
 };
 
-} // namespace hw
+}  // namespace hw
